@@ -19,7 +19,7 @@ class SubRating:
                  name: str, 
                  localized_name: str, 
                  rating_image_url: str, 
-                 value: float | None
+                 value: float
                 ):
         self.name = name
         self.localized_name = localized_name
@@ -32,6 +32,22 @@ class TripType:
         self.localized_name = localized_name
         self.value = value
 
+
+class ReviewRatingCount:
+    def __init__(self,
+                 one: int,
+                 two: int,
+                 three: int,
+                 four: int,
+                 five: int
+                ):
+        self.one = one
+        self.two = two
+        self.three = three
+        self.four = four
+        self.five = five
+
+
 class Location:
     def __init__(self,
                  name: str,
@@ -39,11 +55,11 @@ class Location:
                  web_url: str,
                  web_photos: str,
                  address: str,
-                 category: dict,
+                 category: str,
                  ranking_data: RankingData,
-                 rating: float,
+                 review_rating_count: ReviewRatingCount,
                  num_reviews: int,
-                 ratings: dict,
+                 rating: dict,
                  sub_rating: SubRating,
                  price_level: str,
                  amenities: List[str],
@@ -57,9 +73,9 @@ class Location:
         self.address = address
         self.category = category
         self.ranking_data = ranking_data
-        self.rating = rating
+        self.review_rating_count = review_rating_count
         self.num_reviews = num_reviews
-        self.ratings = ratings
+        self.rating = rating
         self.sub_rating = sub_rating
         self.price_level = price_level
         self.amenities = amenities
