@@ -8,7 +8,7 @@ from models.tripadvisor_response.location_details import Location
 from typing import Optional
 
 
-def find_search_by_query(query: str, category: str) -> list[models.tripadvisor_response.location_search.Location]:
+def find_search_by_query(query: str, category: str) -> list[models.tripadvisor_response.location_search.Location] | ValueError:
     query = query.replace(" ", "%20")
     category = category.replace(" ", "%20")
     url = f"https://api.content.tripadvisor.com/api/v1/location/search?key={config.tripadvisor_token}&searchQuery={query}&category={category}&language=en"
@@ -28,11 +28,9 @@ def find_search_by_query(query: str, category: str) -> list[models.tripadvisor_r
 
         return locations
     else:
-        print("Error al obtener los datos: ", response.status_code)
-        return []
+        return ValueError("Error at finding search by query: ", response.status_code)
 
-
-def get_location_details_by_id(location_id: int) -> Location:
+def get_location_details_by_id(location_id: int) -> Location | ValueError:
     url = f"https://api.content.tripadvisor.com/api/v1/location/{location_id}/details?key={config.tripadvisor_token}&language=en&currency=COP"
     headers = {
         "accept": "application/json"
@@ -85,55 +83,4 @@ def get_location_details_by_id(location_id: int) -> Location:
         return location_obj
 
     else:
-        # Handle the case when the API request fails
-        print("Error:", response.status_code)
-        return None
-
-result = find_search_by_query("villa de leyva", "hotels")
-
-for loc in result:
-    print(f"Location ID: {loc.location_id}")
-    print(f"Name: {loc.name}")
-    print("Address:")
-    print(f"  Street 1: {loc.address_obj.street1}")
-    print(f"  City: {loc.address_obj.city}")
-    print(f"  Country: {loc.address_obj.country}")
-    print()
-
-    location_details = get_location_details_by_id(loc.location_id)
-    if location_details:
-        print("Details:")
-        print(f"  Name: {location_details.name}")
-        print(f"  Description: {location_details.description}")
-        print(f"  Web Url: {location_details.web_url}")
-        print(f"  Address: {location_details.address}")
-        print(f"  Category: {location_details.category}")
-        print(f"  Ranking Data:")
-        print(f"    Geo Location ID: {location_details.ranking_data.geo_location_id}")
-        print(f"    Ranking String: {location_details.ranking_data.ranking_string}")
-        print(f"    Geo Location Name: {location_details.ranking_data.geo_location_name}")
-        print(f"    Ranking Out Of: {location_details.ranking_data.ranking_out_of}")
-        print(f"    Ranking: {location_details.ranking_data.ranking}")
-        print(f"  Rating: {str(location_details.rating)}")
-        print(f"  Num Reviews: {location_details.num_reviews}")
-        print(f"  Review Rating Count:")
-        print(f"    One: {str(location_details.review_rating_count.one)}")
-        print(f"    Two: {str(location_details.review_rating_count.two)}")
-        print(f"    Three: {str(location_details.review_rating_count.three)}")
-        print(f"    Four: {str(location_details.review_rating_count.four)}")
-        print(f"    Five: {str(location_details.review_rating_count.five)}")
-        print(f"  Sub Rating:")
-        print(f"    Name: {location_details.sub_rating.name}")
-        print(f"    Localized Name: {location_details.sub_rating.localized_name}")
-        print(f"    Rating Image Url: {location_details.sub_rating.rating_image_url}")
-        print(f"    Value: {str(location_details.sub_rating.value)}")
-        print(f"  Price Level: {location_details.price_level}")
-        print(f'  Amenities: {", ". join(location_details.amenities)}')
-        print(f'  Styles: {", ".join(location_details.styles)}')
-        print(f"  Trip Type:")
-        print(f"    Name: {location_details.trip_type.name}")
-        print(f"    Localized Name: {location_details.trip_type.localized_name}")
-        print(f"    Value: {location_details.trip_type.value}")
-        print()
-    else:
-        print("No se pudieron obtener los detalles de la ubicación.")
+        return ValueError("Error at getting location details: ", response.status_code)
