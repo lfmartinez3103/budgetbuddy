@@ -63,6 +63,7 @@ class Location:
                  sub_rating: SubRating,
                  price_level: str,
                  amenities: List[str],
+                 features: List[str],
                  styles: List[str],
                  trip_type: TripType
                 ):
@@ -79,5 +80,6 @@ class Location:
         self.sub_rating = sub_rating
         self.price_level = price_level
         self.amenities = amenities
+        self.features = features
         self.styles = styles
         self.trip_type = trip_type

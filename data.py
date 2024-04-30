@@ -21,9 +21,18 @@ def find_search_by_query(query: str, category: str) -> list[models.tripadvisor_r
         data = json.loads(response.text)
         locations = []
         for item in data['data']:
-            address_data = item.get('address_obj', {})
-            address = models.tripadvisor_response.location_search.Address(**address_data)
-            location = models.tripadvisor_response.location_search.Location(item['location_id'], item['name'], address)
+            location = models.tripadvisor_response.location_search.Location(
+                location_id=int(item.get("location_id", -1)),
+                name=item.get("name", "Name not found"),
+                address_obj=models.tripadvisor_response.location_search.Address(
+                    street1=item.get("address_obj", {}).get("street1", "Street1 not found"),
+                    street2=item.get("address_obj", {}).get("street2", "Street2 not found"),
+                    city=item.get("address_obj", {}).get("city", "City not found"),
+                    country=item.get("address_obj", {}).get("country", "Country not found"),
+                    postalcode=item.get("address_obj", {}).get("postalcode", "Postalcode not found"),
+                    address_string=item.get("address_obj", {}).get("address_string", "Address not found")
+                ))
+
             locations.append(location)
 
         return locations
@@ -41,7 +50,7 @@ def get_location_details_by_id(location_id: int) -> Location | ValueError:
     if response.status_code == 200:
         data = json.loads(response.text)
         
-        location_obj = Location(
+        location_obj = models.tripadvisor_response.location_details.Location(
             name=data.get("name", "Name not found"),
             description=data.get("description", "Description not found"),
             web_url=data.get("web_url", "Web Url not found"),
@@ -72,6 +81,7 @@ def get_location_details_by_id(location_id: int) -> Location | ValueError:
             ),
             price_level=data.get("price_level", "Price Level not found"),
             amenities=data.get("amenities", ["Amentities not found"]),
+            features=data.get("features", ["Features not found"]),
             styles=data.get("styles", ["Styles not found"]),
             trip_type=models.tripadvisor_response.location_details.TripType(
                 name=data.get("trip_type", {}).get("name", "Name not found"),
