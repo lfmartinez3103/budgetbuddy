@@ -94,3 +94,14 @@ def get_location_details_by_id(location_id: int) -> Location | ValueError:
 
     else:
         return ValueError("Error at getting location details: ", response.status_code)
+    
+def search_best_hotel_and_restaurant(destination: str, budget: str, trip_type: str) -> list[str] | ValueError:
+    # TODO: Validar dependiendo del presupuesto y tipo de viaje
+    hotels = find_search_by_query(destination, "hotels")
+    restaurants = find_search_by_query(destination, "restaurants")
+    
+    if hotels and restaurants:
+        # aqui solo devuelve el nombre, como objeto Location
+        return hotels[0].name, restaurants[0].name
+    else:
+        return ValueError("Error at searching best hotel and restaurant")    
