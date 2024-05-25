@@ -1,4 +1,5 @@
 from config import app_name, bg_color, logo_color_yellow
+from data import *
 
 import flet as ft
 
@@ -9,47 +10,57 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-    destinations = [
-        ft.NavigationDestination(icon=ft.icons.TRAVEL_EXPLORE_ROUNDED, label="Plan it"),
-        ft.NavigationDestination(icon=ft.icons.ROCKET_LAUNCH_SHARP, label="Surprise me"),
-        ft.NavigationDestination(icon=ft.icons.INFO_OUTLINE, label="About us"),
-    ]
-
-    def format_number(number):
-        return "{:,}".format(number).replace(",", ".")
-
-    def change_tab(e):
-
-        print("Selected tab:", e.control.selected_index)
-        page.clean()
-
-        cg = ft.RadioGroup(content=ft.Column([
-        ft.Radio(value="cheap", label="Cheap"),
-        ft.Radio(value="mid", label="Mid"),
-        ft.Radio(value="Fancy", label="Fancy")], alignment=ft.MainAxisAlignment.CENTER), on_change=lambda e: print(e.control.value))
-
-        if e.control.selected_index == 0:
-            page.add(
-                ft.Text("Ingrese su destino aqui:"),
-                ft.TextField(
-                    on_change=lambda e: print(e.control.value)
-                ),
-                cg,
-                ft.TextButton("Next")
+    def page_show_best_options(destino, presupuesto):
+        print(presupuesto, type(presupuesto))
+        # TODO: Muestre las mejores opciones para el destino ingresado en una ft.Card, que muestre 3 opciones de hoteles y restaurantes
+        options = search_best_hotel_and_restaurant(destino, budget=presupuesto)
+        
+        page.views.clear()
+        page.views.append(
+            ft.View(
+                controls=[
+                    ft.Column(
+                        controls=[
+                            ft.Text("Mejores opciones para ti:"),
+                            ft.Text(f"Hotel: {options[0]}"),
+                            ft.Text(f"Restaurante: {options[1]}"),
+                        ]
+                    )
+                ]
             )
-        elif e.control.selected_index == 1:
-            page.add(ft.Text("Contenido para Sorprendeme"))
-        elif e.control.selected_index == 2:
-            page.add(ft.Text("Contenido para Sobre nosotros"))
+        )
+        page.update()
 
-    page.navigation_bar = ft.CupertinoNavigationBar(
-        bgcolor=bg_color,
-        inactive_color=ft.colors.WHITE,
-        active_color=logo_color_yellow,
-        on_change=change_tab,
-        destinations=destinations
-    )
+    def page_ask_destination(e):
+        page.views.clear()
+        page.views.append(
+            ft.View(
+                controls=[
+                    ft.Column(
+                        controls=[
+                            ft.Text("Ingrese su destino aqui:"),
+                            ft.TextField(
+                                label="Destino",
+                                on_change=lambda e: setattr(page, "destino", e.control.value),
+                            ),
+                            
+                            ft.Text("Ingrese su presupuesto"),
+                            ft.Dropdown(
+                                options=[
+                                    ft.dropdown.Option("$"),
+                                    ft.dropdown.Option("$$"),
+                                    ft.dropdown.Option("$$$")
+                                ],
+                                on_change=lambda e: setattr(page, "presupuesto", e.control.value)
+                            ),
+                            ft.ElevatedButton("Next", on_click=lambda e: page_show_best_options(getattr(page, "destino", ""), getattr(page, "presupuesto", "$$$"))),
+                        ]
+                    )
+                ]
+            )
+        )
+        page.update()
 
-    page.add(ft.Text("Hello world"))
+    page_ask_destination(None)
 
 ft.app(target=main)
